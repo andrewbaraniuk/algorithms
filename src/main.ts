@@ -191,5 +191,15 @@ import { insertionSortImperative, insertionSortFunctional, insertionSortTrampoli
 // Сортування злиттям (Merge sort).
 import { mergeSort, mergeSortFn } from "./merge_sort";
 // [5, 3, 6, 2, 10] => [2, 3, 5, 6, 10].
-console.log("mergeSort", mergeSort([5, 3, 6, 2, 10], 0, 4));
-console.log("mergeSortFn", mergeSortFn([5, 3, 6, 2, 10]));
+// console.log("mergeSort", mergeSort([5, 3, 6, 2, 10], 0, 4));
+// console.log("mergeSortFn", mergeSortFn([5, 3, 6, 2, 10]));
+
+// Швидке сортування.
+import { sort } from "./quicksort_2";
+// const arr = [7, 3, 10, 23, 6, 2, 0, 8];
+// console.log("quickSort", sort(arr));
+
+// Сортування підрахунком (Counting sort).
+import { countingSort } from "./counting_sort";
+// const arr = [2, 1, 2, 0, 0, 2];
+// console.log("countingSort", countingSort(arr, 2));

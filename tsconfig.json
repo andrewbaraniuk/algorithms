@@ -16,6 +16,8 @@
         "src/bellman-ford.ts",
         "src/insertion_sort.ts",
         "src/merge_sort.ts",
+        "src/quicksort_2.ts",
+        "src/counting_sort.ts"
     ],
     "compilerOptions": {
         "noImplicitAny": true,
