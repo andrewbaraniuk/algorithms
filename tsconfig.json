@@ -14,6 +14,8 @@
         "src/dijkstra.ts",
         "src/dijkstra_oop.ts",
         "src/bellman-ford.ts",
+        "src/insertion_sort.ts",
+        "src/merge_sort.ts",
     ],
     "compilerOptions": {
         "noImplicitAny": true,

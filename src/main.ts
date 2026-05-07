@@ -63,7 +63,7 @@ import { search } from "./bfs";
 // search("you", graph);
 
 // Алгоритм Дейкстри (Dijkstra's algorithm).
-// import { Graph, dijkstraProcess } from "./dijkstra";
+import { Graph, dijkstraProcess } from "./dijkstra";
 // Граф з книги: Twin Peaks → Міст Голден Гейт.
 // Використовується "вага" для визначення найкоротшого шляху (наприклад, часу в дорозі).
 // ![Dijkstra graph](../assets/graph-dijkstra.png)
@@ -78,11 +78,31 @@ import { search } from "./bfs";
 // };
 // const start = "Twin Peaks";
 // const end = "Bridge";
-
+// const graph: Graph = {
+//     "start": { "a": 5, "b": 2 },
+//     "a": { "c": 4, "d": 2 },
+//     "b": { "a": 8, "d": 7 },
+//     "c": { "d": 6, "finish": 3 },
+//     "d": { "finish": 1 },
+//     "finish": {},
+// };
+// const start = "start";
+// const end = "finish";
+// Очікується: start → a → d → finish = 8
+// const graph: Graph = {
+//     "start": { "a": 10 },
+//     "a": { "c": 20, "b": 1 },
+//     "b": { "c": 1 },
+//     "c": { "finish": 30 },
+//     "finish": {},
+// };
+// const start = "start";
+// const end = "finish";
+// Очікується: start → a → b → c → finish = 42
 // dijkstraProcess(graph, start, end);
 
 // Алгоритм Дейкстри (Dijkstra's algorithm), OOP.
-import { Graph, dijkstraProcess } from "./dijkstra_oop";
+// import { Graph, dijkstraProcess } from "./dijkstra_oop";
 // const graph: Graph = {
 //     "Twin Peaks": { "A": 4, "B": 10 },
 //     "A": { "C": 5, "D": 21 },
@@ -100,50 +120,76 @@ import { Graph, dijkstraProcess } from "./dijkstra_oop";
 // Алгоритм Беллмана-Форда (Bellman-Ford algorithm).
 // ![Bellman-Ford](../assets/graph-bellman-ford.jpg)
 import { bellmanFord, reconstructPath } from "./bellman-ford";
-const nodes = [
-    "нотний зошит",
-    "рідкісна платівка",
-    "постер",
-    "бас-гітара",
-    "барабанна установка",
-    "піаніно",
-];
+// const nodes = [
+//     "нотний зошит",
+//     "рідкісна платівка",
+//     "постер",
+//     "бас-гітара",
+//     "барабанна установка",
+//     "піаніно",
+// ];
 
-const edges = [
-    { from: "нотний зошит", to: "рідкісна платівка", weight: 5 },
-    { from: "нотний зошит", to: "постер", weight: 0 },
-    { from: "рідкісна платівка", to: "бас-гітара", weight: 15 },
-    { from: "рідкісна платівка", to: "барабанна установка", weight: 20 },
-    { from: "постер", to: "бас-гітара", weight: 30 },
-    { from: "постер", to: "барабанна установка", weight: 35 },
-    { from: "бас-гітара", to: "піаніно", weight: 20 },
-    // Від'ємне ребро — саме через нього Дейкстра б дала неправильну відповідь
-    { from: "барабанна установка", to: "піаніно", weight: -10 },
-];
+// const edges = [
+//     { from: "нотний зошит", to: "рідкісна платівка", weight: 5 },
+//     { from: "нотний зошит", to: "постер", weight: 0 },
+//     { from: "рідкісна платівка", to: "бас-гітара", weight: 15 },
+//     { from: "рідкісна платівка", to: "барабанна установка", weight: 20 },
+//     { from: "постер", to: "бас-гітара", weight: 30 },
+//     { from: "постер", to: "барабанна установка", weight: 35 },
+//     { from: "бас-гітара", to: "піаніно", weight: 20 },
+//     // Від'ємне ребро — саме через нього Дейкстра б дала неправильну відповідь
+//     { from: "барабанна установка", to: "піаніно", weight: -10 },
+// ];
 
-const source = "нотний зошит";
-const target = "піаніно";
+// const source = "нотний зошит";
+// const target = "піаніно";
+
+// const nodes = ["start", "a", "b", "c", "finish"];
+// const edges = [
+//     { from: "start", to: "a", weight: 2 },
+//     { from: "start", to: "b", weight: 2 },
+//     { from: "a", to: "finish", weight: 2 },
+//     { from: "a", to: "c", weight: 2 },
+//     { from: "b", to: "c", weight: -1 },
+//     { from: "c", to: "finish", weight: 2 },
+// ];
+// const source = "start";
+// const target = "finish";
+// Очікується: start → b → c → finish = 3
 
 // ── Запуск ────────────────────────────────────────────────────────────────────
+// const result = bellmanFord(nodes, edges, source);
 
-const result = bellmanFord(nodes, edges, source);
+// if (result.kind === "negative-cycle") {
+//     console.log("⚠️  Граф містить від'ємний цикл — найкоротшого шляху не існує.");
+// } else {
+//     const { distances, predecessors } = result;
+//     const path = reconstructPath(predecessors, target);
 
-if (result.kind === "negative-cycle") {
-    console.log("⚠️  Граф містить від'ємний цикл — найкоротшого шляху не існує.");
-} else {
-    const { distances, predecessors } = result;
-    const path = reconstructPath(predecessors, target);
+//     console.log("Найдешевший шлях:", path.join(" → "));
+//     console.log("Загальна вартість: $" + distances.get(target));
 
-    console.log("Найдешевший шлях:", path.join(" → "));
-    console.log("Загальна вартість: $" + distances.get(target));
+//     // Покроковий розбір шляху з вартістю кожного обміну
+//     console.log("\nКроки:");
+//     for (let i = 0; i < path.length - 1; i++) {
+//         const from = path[i];
+//         const to = path[i + 1];
+//         const edge = edges.find((e) => e.from === from && e.to === to)!;
+//         const sign = edge.weight >= 0 ? "+" : ""; // мінус і так є в числі
+//         console.log(`  ${from} → ${to}: ${sign}${edge.weight}$`);
+//     }
+// }
 
-    // Покроковий розбір шляху з вартістю кожного обміну
-    console.log("\nКроки:");
-    for (let i = 0; i < path.length - 1; i++) {
-        const from = path[i];
-        const to = path[i + 1];
-        const edge = edges.find((e) => e.from === from && e.to === to)!;
-        const sign = edge.weight >= 0 ? "+" : ""; // мінус і так є в числі
-        console.log(`  ${from} → ${to}: ${sign}${edge.weight}$`);
-    }
-}
+// Сортування вставкою (Insertion sort).
+import { insertionSortImperative, insertionSortFunctional, insertionSortTrampoline } from "./insertion_sort"
+// const input = [5, 3, 6, 2, 10];
+// [5, 3, 6, 2, 10] => [2, 3, 5, 6, 10].
+// console.log("imperative", insertionSortImperative([...input]));
+// console.log("functional", insertionSortFunctional([...input]));
+// console.log("trampoline", insertionSortTrampoline([...input]));
+
+// Сортування злиттям (Merge sort).
+import { mergeSort, mergeSortFn } from "./merge_sort";
+// [5, 3, 6, 2, 10] => [2, 3, 5, 6, 10].
+console.log("mergeSort", mergeSort([5, 3, 6, 2, 10], 0, 4));
+console.log("mergeSortFn", mergeSortFn([5, 3, 6, 2, 10]));
