@@ -17,7 +17,9 @@
         "src/insertion_sort.ts",
         "src/merge_sort.ts",
         "src/quicksort_2.ts",
-        "src/counting_sort.ts"
+        "src/counting_sort.ts",
+        "src/greedy.ts",
+        "src/binary_search_range.ts",
     ],
     "compilerOptions": {
         "noImplicitAny": true,

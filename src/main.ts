@@ -203,3 +203,23 @@ import { sort } from "./quicksort_2";
 import { countingSort } from "./counting_sort";
 // const arr = [2, 1, 2, 0, 0, 2];
 // console.log("countingSort", countingSort(arr, 2));
+
+// Жадібний алгоритм.
+import greedyAlgorithm from "./greedy";
+// Дані: станції та штати, які вони покривають
+// const stations: Map<string, Set<string>> = new Map([
+//     ["kone", new Set(["id", "nv", "ut"])],
+//     ["ktwo", new Set(["wa", "id", "mt"])],
+//     ["kthree", new Set(["or", "nv", "ca"])],
+//     ["kfour", new Set(["nv", "ut"])],
+//     ["kfive", new Set(["ca", "az"])],
+// ]);
+// Штати, які потрібно покрити
+// let statesNeeded: Set<string> = new Set(["mt", "wa", "or", "id", "nv", "ut", "ca", "az"]);
+// console.log("greedyAlgorithm", greedyAlgorithm(statesNeeded, stations));
+
+// Binary Search (Search Range).
+import binarySearchRange from "./binary_search_range";
+console.log(binarySearchRange(1, 100, 10));  // 10
+console.log(binarySearchRange(1, 100, 73));  // 73
+console.log(binarySearchRange(1, 100, 0));   // -1 (out of range)
