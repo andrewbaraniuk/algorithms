@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Алгоритми та Структури Даних</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans:wght@300;400;600&display=swap');
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --border: #1e1e2e;
+    --accent-r: #ff4444;
+    --accent-b: #3b82f6;
+    --accent-g: #22c55e;
+    --accent-y: #f59e0b;
+    --text: #e2e2f0;
+    --muted: #6b6b8a;
+    --node-size: 36px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  header {
+    padding: 3rem 2rem 2rem;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, #0f0f1a 0%, var(--bg) 100%);
+  }
+
+  header h1 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+
+  header h1 span { color: var(--accent-b); }
+  header p { color: var(--muted); margin-top: 0.5rem; font-size: 0.95rem; }
+
+  nav {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    background: var(--surface);
+  }
+
+  nav button {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 1rem 1.5rem;
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  nav button.active { color: #fff; border-bottom-color: var(--accent-b); }
+  nav button:hover:not(.active) { color: var(--text); }
+
+  /* New tag colors */
+  .tag.btree   { background: rgba(168,85,247,0.12); color: #c084fc; border: 1px solid rgba(168,85,247,0.3); }
+  .tag.fourier { background: rgba(6,182,212,0.12);  color: #22d3ee; border: 1px solid rgba(6,182,212,0.3); }
+  .tag.backtrack { background: rgba(251,113,133,0.12); color: #fb7185; border: 1px solid rgba(251,113,133,0.3); }
+  .tag.traversal { background: rgba(163,230,53,0.12); color: #a3e635; border: 1px solid rgba(163,230,53,0.3); }
+
+  .section { display: none; padding: 2rem; max-width: 960px; margin: 0 auto; }
+  .section.active { display: block; animation: fadeIn 0.3s ease; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  h2 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+    color: #fff;
+  }
+
+  h3 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--accent-b);
+    margin: 1.8rem 0 0.6rem;
+  }
+
+  p { color: #c0c0d8; font-size: 0.95rem; margin-bottom: 0.8rem; }
+
+  .tag {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 3px;
+    margin-bottom: 1.2rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+  }
+
+  .tag.balanced { background: rgba(59,130,246,0.15); color: var(--accent-b); border: 1px solid rgba(59,130,246,0.3); }
+  .tag.redblack { background: rgba(255,68,68,0.12); color: var(--accent-r); border: 1px solid rgba(255,68,68,0.3); }
+  .tag.heap { background: rgba(245,158,11,0.12); color: var(--accent-y); border: 1px solid rgba(245,158,11,0.3); }
+  .tag.splay { background: rgba(34,197,94,0.12); color: var(--accent-g); border: 1px solid rgba(34,197,94,0.3); }
+
+  /* Complexity table */
+  .complexity {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 1.5rem 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem;
+  }
+
+  .complexity table { width: 100%; border-collapse: collapse; }
+  .complexity th {
+    background: #161622;
+    padding: 0.7rem 1rem;
+    text-align: left;
+    color: var(--muted);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+  }
+  .complexity td { padding: 0.65rem 1rem; border-top: 1px solid var(--border); }
+  .complexity tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .good { color: var(--accent-g); font-weight: 600; }
+  .avg  { color: var(--accent-y); font-weight: 600; }
+  .bad  { color: var(--accent-r); font-weight: 600; }
+
+  /* SVG trees */
+  .tree-container {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    overflow-x: auto;
+  }
+
+  .tree-container svg { display: block; margin: 0 auto; }
+
+  /* Node styles */
+  .node-bst circle { fill: #1a1a2e; stroke: var(--accent-b); stroke-width: 2; }
+  .node-red circle { fill: #2a0a0a; stroke: var(--accent-r); stroke-width: 2.5; }
+  .node-black circle { fill: #0a0a12; stroke: #888; stroke-width: 2; }
+  .node-nil circle { fill: #0a0a0f; stroke: #333; stroke-width: 1.5; stroke-dasharray: 4,2; r: 12; }
+  .node-heap circle { fill: #1a1208; stroke: var(--accent-y); stroke-width: 2; }
+  .node-splay circle { fill: #0a1a0e; stroke: var(--accent-g); stroke-width: 2; }
+  .node-splay-hot circle { fill: #142010; stroke: #5dfc8a; stroke-width: 3; filter: drop-shadow(0 0 6px rgba(93,252,138,0.5)); }
+  .node-btree circle { fill: #160d2a; stroke: #c084fc; stroke-width: 2; }
+  .node-trav circle { fill: #1a1a2e; stroke: var(--accent-b); stroke-width: 2; }
+  .node-trav-active circle { fill: #1a2a10; stroke: #a3e635; stroke-width: 3; filter: drop-shadow(0 0 5px rgba(163,230,53,0.5)); }
+  .node-trav-visited circle { fill: #0d1a0d; stroke: #4ade80; stroke-width: 1.5; opacity: 0.7; }
+
+  .node-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    fill: #fff;
+    text-anchor: middle;
+    dominant-baseline: central;
+    pointer-events: none;
+  }
+
+  .node-nil .node-label { font-size: 9px; fill: #444; font-weight: 400; }
+
+  .edge { stroke: #2a2a40; stroke-width: 1.5; }
+  .edge-highlight { stroke: #5dfc8a; stroke-width: 2; stroke-dasharray: 5,3; }
+
+  /* Rules block */
+  .rules {
+    background: var(--surface);
+    border-left: 3px solid var(--accent-b);
+    border-radius: 0 6px 6px 0;
+    padding: 1rem 1.2rem;
+    margin: 1.2rem 0;
+    font-size: 0.88rem;
+  }
+
+  .rules.red { border-left-color: var(--accent-r); }
+  .rules.yellow { border-left-color: var(--accent-y); }
+  .rules.green { border-left-color: var(--accent-g); }
+
+  .rules ol, .rules ul { padding-left: 1.2rem; }
+  .rules li { margin-bottom: 0.4rem; color: #c0c0d8; }
+  .rules strong { color: #fff; font-family: 'IBM Plex Mono', monospace; font-size: 0.85em; }
+
+  /* Info grid */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+  @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+  }
+
+  .card h4 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.5rem;
+  }
+
+  .card p { font-size: 0.88rem; margin: 0; }
+
+  /* Rotation demo */
+  .rotation-demo {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 1rem 0;
+  }
+
+  .rot-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 0.5rem;
+  }
+
+  .arrow-right {
+    font-size: 1.4rem;
+    color: var(--accent-g);
+    align-self: center;
+    padding-bottom: 20px;
+  }
+
+  /* Heap levels */
+  .heap-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.3rem 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+  }
+
+  .heap-idx { color: var(--muted); width: 2rem; text-align: right; font-size: 0.75rem; }
+  .heap-val {
+    background: #1a1208;
+    border: 1px solid rgba(245,158,11,0.4);
+    border-radius: 4px;
+    padding: 0.25rem 0.6rem;
+    color: var(--accent-y);
+    font-weight: 600;
+  }
+
+  .heap-formula {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem;
+    color: var(--muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.8rem 1rem;
+    margin: 1rem 0;
+    line-height: 2;
+  }
+
+  .heap-formula span { color: var(--accent-y); }
+
+  /* Math formula block */
+  .formula-block {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.9rem;
+    background: #0a0d14;
+    border: 1px solid #1a2040;
+    border-radius: 6px;
+    padding: 1rem 1.2rem;
+    margin: 1rem 0;
+    color: #22d3ee;
+    line-height: 2.2;
+    overflow-x: auto;
+  }
+  .formula-block .dim { color: var(--muted); font-size: 0.78rem; }
+  .formula-block .hi  { color: #fff; font-weight: 700; }
+
+  /* Pseudocode block */
+  .pseudo {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem;
+    background: #0a0f0a;
+    border: 1px solid #1a2a1a;
+    border-radius: 6px;
+    padding: 1rem 1.2rem;
+    margin: 1rem 0;
+    color: #c0d8c0;
+    line-height: 1.9;
+    white-space: pre;
+    overflow-x: auto;
+  }
+  .pseudo .kw { color: #fb7185; }
+  .pseudo .fn { color: #f59e0b; }
+  .pseudo .cm { color: #4a6a4a; }
+  .pseudo .vr { color: #93c5fd; }
+
+  /* Traversal step display */
+  .trav-output {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.7rem 1rem;
+    margin-top: 0.8rem;
+    min-height: 2.5rem;
+    color: #a3e635;
+    letter-spacing: 0.05em;
+  }
+  .trav-output span { color: var(--muted); margin-right: 0.5rem; }
+
+  /* B-tree node (wide boxes) */
+  .btree-box {
+    display: inline-flex;
+    border: 1.5px solid #c084fc;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #0e0818;
+  }
+  .btree-cell {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #e2d4ff;
+    padding: 0.4rem 0.7rem;
+    border-right: 1px solid #2a1a40;
+    min-width: 2.2rem;
+    text-align: center;
+  }
+  .btree-cell:last-child { border-right: none; }
+
+  /* Fourier bar chart */
+  .fft-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 120px;
+    padding: 0 1rem;
+    margin: 1rem 0;
+  }
+  .fft-bar {
+    flex: 1;
+    background: linear-gradient(180deg, #22d3ee, #0e4f5a);
+    border-radius: 3px 3px 0 0;
+    transition: height 0.5s ease;
+    min-width: 8px;
+  }
+  .fft-label-row {
+    display: flex;
+    gap: 4px;
+    padding: 0 1rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--muted);
+  }
+  .fft-label-row span { flex: 1; text-align: center; }
+
+  /* Backtracking tree node */
+  .bt-node-ok circle   { fill: #0a1a0a; stroke: #22c55e; stroke-width: 2; }
+  .bt-node-fail circle { fill: #1a0a0a; stroke: #ff4444; stroke-width: 1.5; stroke-dasharray: 4,2; }
+  .bt-node-cur circle  { fill: #1a1200; stroke: #f59e0b; stroke-width: 2.5; filter: drop-shadow(0 0 5px rgba(245,158,11,0.4)); }
+
+  /* Splay animation area */
+  #splay-demo { 
+    background: var(--surface); 
+    border: 1px solid var(--border); 
+    border-radius: 8px; 
+    padding: 1.5rem; 
+    margin: 1.5rem 0; 
+  }
+
+  .splay-controls { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 1rem; }
+
+  .btn {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    border: 1px solid;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: all 0.15s;
+  }
+
+  .btn-g { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.4); color: var(--accent-g); }
+  .btn-g:hover { background: rgba(34,197,94,0.2); }
+  .btn-b { background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.4); color: var(--accent-b); }
+  .btn-b:hover { background: rgba(59,130,246,0.2); }
+
+  .splay-log {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--muted);
+    min-height: 1.2rem;
+    margin-top: 0.5rem;
+  }
+
+  .use-cases {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 1rem 0;
+  }
+
+  .use-case {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    padding: 0.3rem 0.7rem;
+    background: #0f1520;
+    border: 1px solid #1a2540;
+    border-radius: 20px;
+    color: #8ab4f8;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>// <span>Tree</span> Data Structures</h1>
+  <p>Збалансовані дерева · Червоно-чорні · Бінарні купи · Splay · Б-дерева · Фур'є · Бектрекінг · Обходи</p>
+</header>
+
+<nav>
+  <button class="active" onclick="show('bst',this)">01 · BST / AVL</button>
+  <button onclick="show('rb',this)">02 · Червоно-чорне</button>
+  <button onclick="show('heap',this)">03 · Бінарна купа</button>
+  <button onclick="show('splay',this)">04 · Splay</button>
+  <button onclick="show('btree',this)">05 · Б-дерева</button>
+  <button onclick="show('fourier',this)">06 · Фур'є / FFT</button>
+  <button onclick="show('backtrack',this)">07 · Бектрекінг</button>
+  <button onclick="show('traversal',this)">08 · Tree Traversal</button>
+</nav>
+
+<!-- ======== SECTION 1: BST / AVL ======== -->
+<div id="bst" class="section active">
+  <h2>Збалансовані бінарні дерева</h2>
+  <div class="tag balanced">AVL · Balanced BST</div>
+
+  <p><strong>Бінарне дерево пошуку (BST)</strong> — структура, де кожен вузол містить ключ, і всі ключі в лівому піддереві менші, а в правому — більші. Проблема простого BST: при послідовній вставці воно виродиться у список, і складність стає O(n).</p>
+
+  <p><strong>AVL-дерево</strong> (Адельсон-Вельський і Ландіс, 1962) — перше самобалансуюче BST. Гарантує, що різниця висот лівого і правого піддерева (balance factor) не перевищує 1.</p>
+
+  <h3>// Структура AVL-дерева</h3>
+
+  <div class="tree-container">
+    <svg width="440" height="220" viewBox="0 0 440 220">
+      <!-- Edges -->
+      <line class="edge" x1="220" y1="40" x2="130" y2="100"/>
+      <line class="edge" x1="220" y1="40" x2="310" y2="100"/>
+      <line class="edge" x1="130" y1="100" x2="80" y2="165"/>
+      <line class="edge" x1="130" y1="100" x2="175" y2="165"/>
+      <line class="edge" x1="310" y1="100" x2="265" y2="165"/>
+      <line class="edge" x1="310" y1="100" x2="360" y2="165"/>
+
+      <!-- Nodes -->
+      <g class="node-bst"><circle cx="220" cy="40" r="22"/><text class="node-label" x="220" y="40">30</text></g>
+      <g class="node-bst"><circle cx="130" cy="100" r="22"/><text class="node-label" x="130" y="100">15</text></g>
+      <g class="node-bst"><circle cx="310" cy="100" r="22"/><text class="node-label" x="310" y="100">45</text></g>
+      <g class="node-bst"><circle cx="80" cy="165" r="22"/><text class="node-label" x="80" y="165">8</text></g>
+      <g class="node-bst"><circle cx="175" cy="165" r="22"/><text class="node-label" x="175" y="165">20</text></g>
+      <g class="node-bst"><circle cx="265" cy="165" r="22"/><text class="node-label" x="265" y="165">38</text></g>
+      <g class="node-bst"><circle cx="360" cy="165" r="22"/><text class="node-label" x="360" y="165">55</text></g>
+
+      <!-- Balance factors -->
+      <text x="248" y="32" font-family="IBM Plex Mono" font-size="10" fill="#3b82f6">bf=0</text>
+      <text x="158" y="92" font-family="IBM Plex Mono" font-size="10" fill="#22c55e">bf=0</text>
+      <text x="338" y="92" font-family="IBM Plex Mono" font-size="10" fill="#22c55e">bf=0</text>
+    </svg>
+  </div>
+
+  <h3>// Ротації для балансування</h3>
+  <p>При порушенні балансу дерево виконує ротацію — O(1) операцію перебудови вузлів.</p>
+
+  <div class="rotation-demo">
+    <div>
+      <svg width="110" height="130" viewBox="0 0 110 130">
+        <line class="edge" x1="55" y1="25" x2="35" y2="70"/>
+        <line class="edge" x1="35" y1="70" x2="20" y2="115"/>
+        <g class="node-bst"><circle cx="55" cy="25" r="18"/><text class="node-label" x="55" y="25">C</text></g>
+        <g class="node-bst"><circle cx="35" cy="70" r="18"/><text class="node-label" x="35" y="70">B</text></g>
+        <g class="node-bst"><circle cx="20" cy="115" r="18"/><text class="node-label" x="20" y="115">A</text></g>
+        <text x="68" y="72" font-family="IBM Plex Mono" font-size="9" fill="#ff4444">bf=-2</text>
+      </svg>
+      <div class="rot-label">До ротації</div>
+    </div>
+    <div class="arrow-right">→</div>
+    <div>
+      <svg width="110" height="130" viewBox="0 0 110 130">
+        <line class="edge" x1="55" y1="50" x2="30" y2="105"/>
+        <line class="edge" x1="55" y1="50" x2="80" y2="105"/>
+        <g class="node-bst"><circle cx="55" cy="50" r="18"/><text class="node-label" x="55" y="50">B</text></g>
+        <g class="node-bst"><circle cx="30" cy="105" r="18"/><text class="node-label" x="30" y="105">A</text></g>
+        <g class="node-bst"><circle cx="80" cy="105" r="18"/><text class="node-label" x="80" y="105">C</text></g>
+        <text x="68" y="42" font-family="IBM Plex Mono" font-size="9" fill="#22c55e">bf=0</text>
+      </svg>
+      <div class="rot-label">Права ротація</div>
+    </div>
+  </div>
+
+  <div class="rules">
+    <strong>4 типи ротацій:</strong>
+    <ol>
+      <li><strong>LL</strong> — права ротація (вставка зліва-зліва)</li>
+      <li><strong>RR</strong> — ліва ротація (вставка справа-справа)</li>
+      <li><strong>LR</strong> — ліво-права подвійна ротація</li>
+      <li><strong>RL</strong> — право-ліва подвійна ротація</li>
+    </ol>
+  </div>
+
+  <h3>// Складність операцій</h3>
+  <div class="complexity">
+    <table>
+      <tr><th>Операція</th><th>Середній</th><th>Найгірший</th></tr>
+      <tr><td>Search</td><td class="good">O(log n)</td><td class="good">O(log n)</td></tr>
+      <tr><td>Insert</td><td class="good">O(log n)</td><td class="good">O(log n)</td></tr>
+      <tr><td>Delete</td><td class="good">O(log n)</td><td class="good">O(log n)</td></tr>
+      <tr><td>Space</td><td class="avg">O(n)</td><td class="avg">O(n)</td></tr>
+    </table>
+  </div>
+
+  <h3>// Де використовується</h3>
+  <div class="use-cases">
+    <span class="use-case">Бази даних (індекси)</span>
+    <span class="use-case">Компілятори (symbol tables)</span>
+    <span class="use-case">Файлові системи</span>
+    <span class="use-case">In-memory sorted maps</span>
+    <span class="use-case">Обчислювальна геометрія</span>
+  </div>
+</div>
+
+<!-- ======== SECTION 2: RED-BLACK ======== -->
+<div id="rb" class="section">
+  <h2>Червоно-чорне дерево</h2>
+  <div class="tag redblack">Red-Black Tree · 1972</div>
+
+  <p>Винайдене Рудольфом Байєром як "symmetric binary B-tree". Це самобалансуюче BST, де кожен вузол має колір — <span style="color:#ff4444">червоний</span> або <span style="color:#aaa">чорний</span>. Менш строге ніж AVL (висота ≤ 2·log₂(n+1)), але потребує менше ротацій при вставці/видаленні.</p>
+
+  <h3>// П'ять незмінних правил</h3>
+  <div class="rules red">
+    <ol>
+      <li>Кожен вузол — або <strong>RED</strong>, або <strong>BLACK</strong></li>
+      <li>Корінь завжди <strong>BLACK</strong></li>
+      <li>Всі листові NIL-вузли — <strong>BLACK</strong></li>
+      <li>Якщо вузол <strong>RED</strong> → обидва його нащадки <strong>BLACK</strong> (немає двох червоних поспіль)</li>
+      <li>Для будь-якого вузла: всі шляхи до листя мають однакову <strong>чорну висоту</strong></li>
+    </ol>
+  </div>
+
+  <h3>// Приклад дерева</h3>
+  <div class="tree-container">
+    <svg width="500" height="280" viewBox="0 0 500 280">
+      <!-- Edges level 1-->
+      <line class="edge" x1="250" y1="40" x2="140" y2="105"/>
+      <line class="edge" x1="250" y1="40" x2="360" y2="105"/>
+      <!-- Edges level 2 -->
+      <line class="edge" x1="140" y1="105" x2="75" y2="175"/>
+      <line class="edge" x1="140" y1="105" x2="200" y2="175"/>
+      <line class="edge" x1="360" y1="105" x2="310" y2="175"/>
+      <line class="edge" x1="360" y1="105" x2="420" y2="175"/>
+      <!-- NIL edges -->
+      <line class="edge" x1="75" y1="175" x2="48" y2="240"/>
+      <line class="edge" x1="75" y1="175" x2="100" y2="240"/>
+      <line class="edge" x1="200" y1="175" x2="175" y2="240"/>
+      <line class="edge" x1="200" y1="175" x2="225" y2="240"/>
+      <line class="edge" x1="310" y1="175" x2="285" y2="240"/>
+      <line class="edge" x1="310" y1="175" x2="335" y2="240"/>
+      <line class="edge" x1="420" y1="175" x2="395" y2="240"/>
+      <line class="edge" x1="420" y1="175" x2="445" y2="240"/>
+
+      <!-- Black nodes -->
+      <g class="node-black"><circle cx="250" cy="40" r="22"/><text class="node-label" x="250" y="40">13</text></g>
+      <g class="node-black"><circle cx="140" cy="105" r="22"/><text class="node-label" x="140" y="105">8</text></g>
+      <g class="node-black"><circle cx="360" cy="105" r="22"/><text class="node-label" x="360" y="105">17</text></g>
+      <g class="node-black"><circle cx="310" cy="175" r="22"/><text class="node-label" x="310" y="175">15</text></g>
+
+      <!-- Red nodes -->
+      <g class="node-red"><circle cx="75" cy="175" r="22"/><text class="node-label" x="75" y="175">1</text></g>
+      <g class="node-red"><circle cx="200" cy="175" r="22"/><text class="node-label" x="200" y="175">11</text></g>
+      <g class="node-red"><circle cx="420" cy="175" r="22"/><text class="node-label" x="420" y="175">25</text></g>
+
+      <!-- NIL nodes -->
+      <g class="node-nil"><circle cx="48" cy="240" r="12"/><text class="node-label" x="48" y="240">N</text></g>
+      <g class="node-nil"><circle cx="100" cy="240" r="12"/><text class="node-label" x="100" y="240">N</text></g>
+      <g class="node-nil"><circle cx="175" cy="240" r="12"/><text class="node-label" x="175" y="240">N</text></g>
+      <g class="node-nil"><circle cx="225" cy="240" r="12"/><text class="node-label" x="225" y="240">N</text></g>
+      <g class="node-nil"><circle cx="285" cy="240" r="12"/><text class="node-label" x="285" y="240">N</text></g>
+      <g class="node-nil"><circle cx="335" cy="240" r="12"/><text class="node-label" x="335" y="240">N</text></g>
+      <g class="node-nil"><circle cx="395" cy="240" r="12"/><text class="node-label" x="395" y="240">N</text></g>
+      <g class="node-nil"><circle cx="445" cy="240" r="12"/><text class="node-label" x="445" y="240">N</text></g>
+
+      <!-- Legend -->
+      <circle cx="20" cy="20" r="8" fill="#2a0a0a" stroke="#ff4444" stroke-width="2"/>
+      <text x="32" y="24" font-family="IBM Plex Mono" font-size="10" fill="#ff4444">RED</text>
+      <circle cx="75" cy="20" r="8" fill="#0a0a12" stroke="#888" stroke-width="2"/>
+      <text x="87" y="24" font-family="IBM Plex Mono" font-size="10" fill="#888">BLACK</text>
+    </svg>
+  </div>
+
+  <h3>// Вставка: три випадки фіксу</h3>
+  <div class="grid-2">
+    <div class="card">
+      <h4>Випадок 1 — «Дядько червоний»</h4>
+      <p>Перефарбувати батька і дядька в BLACK, дідуся в RED. Рухатись вгору.</p>
+    </div>
+    <div class="card">
+      <h4>Випадок 2 — «Дядько чорний, трикутник»</h4>
+      <p>Ротація батька → перетворити в лінію (випадок 3).</p>
+    </div>
+    <div class="card">
+      <h4>Випадок 3 — «Дядько чорний, лінія»</h4>
+      <p>Ротація дідуся + перефарбування батька ↔ дідуся.</p>
+    </div>
+    <div class="card">
+      <h4>AVL vs Red-Black</h4>
+      <p>AVL — суворіший баланс, швидший пошук. RB — менше ротацій, швидша вставка/видалення.</p>
+    </div>
+  </div>
+
+  <h3>// Складність</h3>
+  <div class="complexity">
+    <table>
+      <tr><th>Операція</th><th>Середній</th><th>Найгірший</th></tr>
+      <tr><td>Search</td><td class="good">O(log n)</td><td class="good">O(log n)</td></tr>
+      <tr><td>Insert</td><td class="good">O(log n)</td><td class="good">O(log n)</td></tr>
+      <tr><td>Delete</td><td class="good">O(log n)</td><td class="good">O(log n)</td></tr>
+      <tr><td>Ротації при вставці</td><td class="good">≤ 2</td><td class="good">≤ 2</td></tr>
+    </table>
+  </div>
+
+  <h3>// Де використовується</h3>
+  <div class="use-cases">
+    <span class="use-case">Linux kernel (CFS scheduler)</span>
+    <span class="use-case">Java TreeMap / TreeSet</span>
+    <span class="use-case">C++ std::map / std::set</span>
+    <span class="use-case">nginx / epoll event manager</span>
+    <span class="use-case">Ядро планувальника процесів</span>
+  </div>
+</div>
+
+<!-- ======== SECTION 3: HEAP ======== -->
+<div id="heap" class="section">
+  <h2>Бінарна купа</h2>
+  <div class="tag heap">Binary Heap · Priority Queue</div>
+
+  <p><strong>Бінарна купа</strong> — повне бінарне дерево з властивістю купи: у <em>max-heap</em> кожен батько ≥ нащадки; у <em>min-heap</em> — кожен батько ≤ нащадки. Ефективно зберігається в масиві — без поінтерів!</p>
+
+  <h3>// Max-heap: приклад</h3>
+  <div class="tree-container">
+    <svg width="420" height="200" viewBox="0 0 420 200">
+      <line class="edge" x1="210" y1="35" x2="120" y2="90"/>
+      <line class="edge" x1="210" y1="35" x2="300" y2="90"/>
+      <line class="edge" x1="120" y1="90" x2="65" y2="155"/>
+      <line class="edge" x1="120" y1="90" x2="170" y2="155"/>
+      <line class="edge" x1="300" y1="90" x2="250" y2="155"/>
+      <line class="edge" x1="300" y1="90" x2="355" y2="155"/>
+
+      <g class="node-heap"><circle cx="210" cy="35" r="22"/><text class="node-label" x="210" y="35">100</text></g>
+      <g class="node-heap"><circle cx="120" cy="90" r="22"/><text class="node-label" x="120" y="90">70</text></g>
+      <g class="node-heap"><circle cx="300" cy="90" r="22"/><text class="node-label" x="300" y="90">85</text></g>
+      <g class="node-heap"><circle cx="65" cy="155" r="22"/><text class="node-label" x="65" y="155">40</text></g>
+      <g class="node-heap"><circle cx="170" cy="155" r="22"/><text class="node-label" x="170" y="155">55</text></g>
+      <g class="node-heap"><circle cx="250" cy="155" r="22"/><text class="node-label" x="250" y="155">60</text></g>
+      <g class="node-heap"><circle cx="355" cy="155" r="22"/><text class="node-label" x="355" y="155">30</text></g>
+
+      <!-- Array indices -->
+      <text x="205" y="15" font-family="IBM Plex Mono" font-size="9" fill="#f59e0b" text-anchor="middle">i=0</text>
+      <text x="115" y="72" font-family="IBM Plex Mono" font-size="9" fill="#888" text-anchor="middle">i=1</text>
+      <text x="295" y="72" font-family="IBM Plex Mono" font-size="9" fill="#888" text-anchor="middle">i=2</text>
+      <text x="60" y="137" font-family="IBM Plex Mono" font-size="9" fill="#888" text-anchor="middle">i=3</text>
+      <text x="165" y="137" font-family="IBM Plex Mono" font-size="9" fill="#888" text-anchor="middle">i=4</text>
+      <text x="245" y="137" font-family="IBM Plex Mono" font-size="9" fill="#888" text-anchor="middle">i=5</text>
+      <text x="350" y="137" font-family="IBM Plex Mono" font-size="9" fill="#888" text-anchor="middle">i=6</text>
+    </svg>
+  </div>
+
+  <h3>// Масив-представлення</h3>
+  <div style="display:flex;gap:0.3rem;flex-wrap:wrap;align-items:center;margin:1rem 0;">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:0.75rem;color:var(--muted);margin-right:0.3rem">idx:</div>
+    <div class="heap-row" style="margin:0">
+      <div class="heap-val" style="position:relative">100<span style="position:absolute;top:-14px;left:0;right:0;text-align:center;font-size:9px;color:#888">0</span></div>
+      <div class="heap-val" style="position:relative">70<span style="position:absolute;top:-14px;left:0;right:0;text-align:center;font-size:9px;color:#888">1</span></div>
+      <div class="heap-val" style="position:relative">85<span style="position:absolute;top:-14px;left:0;right:0;text-align:center;font-size:9px;color:#888">2</span></div>
+      <div class="heap-val" style="position:relative">40<span style="position:absolute;top:-14px;left:0;right:0;text-align:center;font-size:9px;color:#888">3</span></div>
+      <div class="heap-val" style="position:relative">55<span style="position:absolute;top:-14px;left:0;right:0;text-align:center;font-size:9px;color:#888">4</span></div>
+      <div class="heap-val" style="position:relative">60<span style="position:absolute;top:-14px;left:0;right:0;text-align:center;font-size:9px;color:#888">5</span></div>
+      <div class="heap-val" style="position:relative">30<span style="position:absolute;top:-14px;left:0;right:0;text-align:center;font-size:9px;color:#888">6</span></div>
+    </div>
+  </div>
+
+  <div class="heap-formula">
+    parent(i) = <span>⌊(i−1) / 2⌋</span><br>
+    left(i)   = <span>2·i + 1</span><br>
+    right(i)  = <span>2·i + 2</span>
+  </div>
+
+  <h3>// Ключові операції</h3>
+  <div class="grid-2">
+    <div class="card">
+      <h4>Sift Up (вставка)</h4>
+      <p>Додати в кінець масиву. Поки порушується heap property — міняти з батьком. O(log n).</p>
+    </div>
+    <div class="card">
+      <h4>Sift Down (видалення кореня)</h4>
+      <p>Замінити корінь останнім елементом. Поки порушується — міняти з більшим нащадком. O(log n).</p>
+    </div>
+    <div class="card">
+      <h4>Heapify (побудова з масиву)</h4>
+      <p>Sift-down для кожного внутрішнього вузла знизу вгору. O(n) — швидше за O(n log n) послідовних вставок.</p>
+    </div>
+    <div class="card">
+      <h4>Heap Sort</h4>
+      <p>Побудувати max-heap → n разів витягти максимум. O(n log n), O(1) додаткової пам'яті.</p>
+    </div>
+  </div>
+
+  <h3>// Складність</h3>
+  <div class="complexity">
+    <table>
+      <tr><th>Операція</th><th>Час</th><th>Примітка</th></tr>
+      <tr><td>peek (max/min)</td><td class="good">O(1)</td><td style="color:var(--muted);font-size:0.82rem">завжди корінь</td></tr>
+      <tr><td>insert</td><td class="good">O(log n)</td><td style="color:var(--muted);font-size:0.82rem">sift up</td></tr>
+      <tr><td>extract max/min</td><td class="good">O(log n)</td><td style="color:var(--muted);font-size:0.82rem">sift down</td></tr>
+      <tr><td>heapify</td><td class="good">O(n)</td><td style="color:var(--muted);font-size:0.82rem">лінійний!</td></tr>
+      <tr><td>heap sort</td><td class="avg">O(n log n)</td><td style="color:var(--muted);font-size:0.82rem">in-place</td></tr>
+    </table>
+  </div>
+
+  <h3>// Де використовується</h3>
+  <div class="use-cases">
+    <span class="use-case">Алгоритм Дейкстри (priority queue)</span>
+    <span class="use-case">A* pathfinding</span>
+    <span class="use-case">Планувальник задач OS</span>
+    <span class="use-case">Медіана в потоці даних</span>
+    <span class="use-case">K найбільших/менших елементів</span>
+    <span class="use-case">Huffman encoding</span>
+  </div>
+</div>
+
+<!-- ======== SECTION 4: SPLAY ======== -->
+<div id="splay" class="section">
+  <h2>Розширювані дерева (Splay Trees)</h2>
+  <div class="tag splay">Splay Tree · 1985 · Sleator &amp; Tarjan</div>
+
+  <p>Splay-дерево — самоналаштовуюче BST без явного зберігання балансу або кольору. При кожному доступі до вузла він переміщується в корінь через <strong>splay-операцію</strong>. Нещодавно використані елементи знаходяться швидше.</p>
+  <p>Ключова ідея: <em>часта операція → дешевша амортизована вартість</em>. Немає гарантій на окремі операції, але амортизована складність O(log n).</p>
+
+  <h3>// Три типи splay-кроків</h3>
+  <div class="rules green">
+    <ul>
+      <li><strong>Zig</strong> — x є дитиною кореня → одна ротація</li>
+      <li><strong>Zig-Zig</strong> — x і батько з одного боку (обидва ліві або обидва праві) → дві ротації батька, потім x</li>
+      <li><strong>Zig-Zag</strong> — x і батько з різних боків (трикутник) → дві ротації x</li>
+    </ul>
+  </div>
+
+  <h3>// Демонстрація: splay вузла до кореня</h3>
+  <div id="splay-demo">
+    <div class="splay-controls">
+      <button class="btn btn-g" onclick="splayNode(4)">Splay(4)</button>
+      <button class="btn btn-g" onclick="splayNode(7)">Splay(7)</button>
+      <button class="btn btn-g" onclick="splayNode(1)">Splay(1)</button>
+      <button class="btn btn-b" onclick="resetSplay()">↺ Reset</button>
+    </div>
+    <svg id="splay-svg" width="400" height="240" viewBox="0 0 400 240"></svg>
+    <div id="splay-log" class="splay-log">Натисни Splay(x) щоб побачити ефект</div>
+  </div>
+
+  <h3>// Складність</h3>
+  <div class="complexity">
+    <table>
+      <tr><th>Операція</th><th>Амортизована</th><th>Найгірший (окрема)</th></tr>
+      <tr><td>Search</td><td class="good">O(log n)</td><td class="bad">O(n)</td></tr>
+      <tr><td>Insert</td><td class="good">O(log n)</td><td class="bad">O(n)</td></tr>
+      <tr><td>Delete</td><td class="good">O(log n)</td><td class="bad">O(n)</td></tr>
+      <tr><td>Access (cache hit)</td><td class="good">O(1)*</td><td style="color:var(--muted)">якщо нещодавно</td></tr>
+    </table>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h4>Переваги</h4>
+      <p>Немає додаткових полів (колір, висота). Добре для кешу з локальністю доступу. Проста реалізація.</p>
+    </div>
+    <div class="card">
+      <h4>Недоліки</h4>
+      <p>Погані гарантії для окремих операцій. Read модифікує дерево — проблема для concurrent access.</p>
+    </div>
+  </div>
+
+  <h3>// Де використовується</h3>
+  <div class="use-cases">
+    <span class="use-case">Windows NT (virtual memory)</span>
+    <span class="use-case">GNU libstdc++ rope</span>
+    <span class="use-case">Мережеві кеші</span>
+    <span class="use-case">Текстові редактори (gap buffer alt)</span>
+    <span class="use-case">LRU-cache реалізації</span>
+  </div>
+</div>
+
+<!-- ======== SECTION 5: B-TREE ======== -->
+<div id="btree" class="section">
+  <h2>Б-дерева (B-Trees)</h2>
+  <div class="tag btree">B-Tree · Bayer & McCreight · 1972</div>
+
+  <p><strong>Б-дерево порядку m</strong> — узагальнення BST, де кожен вузол може мати до <em>m−1 ключів</em> і до <em>m нащадків</em>. Розроблено для мінімізації дискових операцій: один вузол = один блок диска (зазвичай 4–16 KB).</p>
+  <p>На відміну від AVL чи Red-Black, де вузол має 1 ключ і 2 нащадки, Б-дерево «розширюється вшир» — дерево залишається дуже плоским, і кількість звернень до диска мінімальна.</p>
+
+  <h3>// Структура вузла (порядок 4)</h3>
+  <div class="tree-container" style="text-align:center;padding:2rem 1rem;">
+    <svg width="520" height="240" viewBox="0 0 520 240">
+      <!-- Root node with 3 keys -->
+      <rect x="150" y="20" width="220" height="38" rx="4" fill="#0e0818" stroke="#c084fc" stroke-width="1.5"/>
+      <line x1="220" y1="20" x2="220" y2="58" stroke="#2a1a40" stroke-width="1"/>
+      <line x1="290" y1="20" x2="290" y2="58" stroke="#2a1a40" stroke-width="1"/>
+      <text x="185" y="44" font-family="IBM Plex Mono" font-size="14" font-weight="700" fill="#e2d4ff" text-anchor="middle">20</text>
+      <text x="255" y="44" font-family="IBM Plex Mono" font-size="14" font-weight="700" fill="#e2d4ff" text-anchor="middle">40</text>
+      <text x="325" y="44" font-family="IBM Plex Mono" font-size="14" font-weight="700" fill="#e2d4ff" text-anchor="middle">60</text>
+
+      <!-- Edges to children -->
+      <line x1="170" y1="58" x2="65" y2="140" stroke="#2a2a40" stroke-width="1.5"/>
+      <line x1="235" y1="58" x2="200" y2="140" stroke="#2a2a40" stroke-width="1.5"/>
+      <line x1="305" y1="58" x2="330" y2="140" stroke="#2a2a40" stroke-width="1.5"/>
+      <line x1="360" y1="58" x2="460" y2="140" stroke="#2a2a40" stroke-width="1.5"/>
+
+      <!-- Child 1: keys < 20 -->
+      <rect x="10" y="140" width="110" height="38" rx="4" fill="#0e0818" stroke="#c084fc" stroke-width="1.5"/>
+      <line x1="65" y1="140" x2="65" y2="178" stroke="#2a1a40" stroke-width="1"/>
+      <text x="37" y="164" font-family="IBM Plex Mono" font-size="13" font-weight="700" fill="#e2d4ff" text-anchor="middle">5</text>
+      <text x="88" y="164" font-family="IBM Plex Mono" font-size="13" font-weight="700" fill="#e2d4ff" text-anchor="middle">12</text>
+
+      <!-- Child 2: 20-40 -->
+      <rect x="155" y="140" width="90" height="38" rx="4" fill="#0e0818" stroke="#c084fc" stroke-width="1.5"/>
+      <line x1="200" y1="140" x2="200" y2="178" stroke="#2a1a40" stroke-width="1"/>
+      <text x="177" y="164" font-family="IBM Plex Mono" font-size="13" font-weight="700" fill="#e2d4ff" text-anchor="middle">25</text>
+      <text x="222" y="164" font-family="IBM Plex Mono" font-size="13" font-weight="700" fill="#e2d4ff" text-anchor="middle">32</text>
+
+      <!-- Child 3: 40-60 -->
+      <rect x="280" y="140" width="100" height="38" rx="4" fill="#0e0818" stroke="#c084fc" stroke-width="1.5"/>
+      <line x1="330" y1="140" x2="330" y2="178" stroke="#2a1a40" stroke-width="1"/>
+      <text x="305" y="164" font-family="IBM Plex Mono" font-size="13" font-weight="700" fill="#e2d4ff" text-anchor="middle">45</text>
+      <text x="355" y="164" font-family="IBM Plex Mono" font-size="13" font-weight="700" fill="#e2d4ff" text-anchor="middle">52</text>
+
+      <!-- Child 4: > 60 -->
+      <rect x="400" y="140" width="110" height="38" rx="4" fill="#0e0818" stroke="#c084fc" stroke-width="1.5"/>
+      <line x1="455" y1="140" x2="455" y2="178" stroke="#2a1a40" stroke-width="1"/>
+      <text x="427" y="164" font-family="IBM Plex Mono" font-size="13" font-weight="700" fill="#e2d4ff" text-anchor="middle">70</text>
+      <text x="480" y="164" font-family="IBM Plex Mono" font-size="13" font-weight="700" fill="#e2d4ff" text-anchor="middle">85</text>
+
+      <!-- Annotations -->
+      <text x="260" y="12" font-family="IBM Plex Mono" font-size="9" fill="#c084fc" text-anchor="middle">корінь: 3 ключі, 4 нащадки</text>
+      <text x="65" y="200" font-family="IBM Plex Mono" font-size="9" fill="#6b6b8a" text-anchor="middle">≤ 20</text>
+      <text x="200" y="200" font-family="IBM Plex Mono" font-size="9" fill="#6b6b8a" text-anchor="middle">20-40</text>
+      <text x="330" y="200" font-family="IBM Plex Mono" font-size="9" fill="#6b6b8a" text-anchor="middle">40-60</text>
+      <text x="455" y="200" font-family="IBM Plex Mono" font-size="9" fill="#6b6b8a" text-anchor="middle">≥ 60</text>
+    </svg>
+  </div>
+
+  <h3>// Інваріанти Б-дерева порядку m</h3>
+  <div class="rules" style="border-left-color:#c084fc">
+    <ol>
+      <li>Кожен вузол має <strong>≤ m−1 ключів</strong> і <strong>≤ m нащадків</strong></li>
+      <li>Кожен не-кореневий внутрішній вузол має <strong>≥ ⌈m/2⌉ нащадків</strong></li>
+      <li>Корінь має <strong>≥ 2 нащадки</strong> (якщо не листок)</li>
+      <li>Всі листки на <strong>однаковій глибині</strong> (дерево завжди збалансоване!)</li>
+      <li>Ключі всередині вузла <strong>відсортовані</strong></li>
+    </ol>
+  </div>
+
+  <h3>// Варіанти</h3>
+  <div class="grid-2">
+    <div class="card">
+      <h4>B+ Tree</h4>
+      <p>Дані тільки в листках. Листки з'єднані в зв'язаний список → ефективне сканування діапазонів. Використовується у більшості СУБД (InnoDB, PostgreSQL).</p>
+    </div>
+    <div class="card">
+      <h4>B* Tree</h4>
+      <p>Вузли заповнені мінімум на 2/3 (замість 1/2). Рідший спліт — краща утилізація пам'яті. Використовується у HFS (Apple).</p>
+    </div>
+    <div class="card">
+      <h4>2-3 Tree</h4>
+      <p>Б-дерево порядку 3. Кожен вузол має 2 або 3 нащадки. Простіша реалізація, дидактично корисне.</p>
+    </div>
+    <div class="card">
+      <h4>LSM-Tree</h4>
+      <p>Log-Structured Merge Tree — альтернатива для write-heavy навантаження. Використовується у RocksDB, Cassandra, LevelDB.</p>
+    </div>
+  </div>
+
+  <h3>// Складність (порядок m, n ключів)</h3>
+  <div class="complexity">
+    <table>
+      <tr><th>Операція</th><th>Час</th><th>Дискові читання</th></tr>
+      <tr><td>Search</td><td class="good">O(log n)</td><td class="good">O(log_m n)</td></tr>
+      <tr><td>Insert</td><td class="good">O(log n)</td><td class="good">O(log_m n)</td></tr>
+      <tr><td>Delete</td><td class="good">O(log n)</td><td class="good">O(log_m n)</td></tr>
+      <tr><td>Range scan</td><td class="good">O(log n + k)</td><td style="color:var(--muted);font-size:0.82rem">k = результати</td></tr>
+    </table>
+  </div>
+
+  <p style="color:var(--muted);font-size:0.85rem">При m=1000: дерево з мільярдом ключів має висоту всього 3! Порівняй з AVL: log₂(10⁹) ≈ 30 рівнів.</p>
+
+  <h3>// Де використовується</h3>
+  <div class="use-cases">
+    <span class="use-case">MySQL InnoDB (B+ Tree)</span>
+    <span class="use-case">PostgreSQL indexes</span>
+    <span class="use-case">SQLite</span>
+    <span class="use-case">NTFS / ext4 (файлові системи)</span>
+    <span class="use-case">MongoDB WiredTiger</span>
+    <span class="use-case">Oracle DB</span>
+  </div>
+</div>
+
+<!-- ======== SECTION 6: FOURIER ======== -->
+<div id="fourier" class="section">
+  <h2>Перетворення Фур'є (DFT / FFT)</h2>
+  <div class="tag fourier">Fourier Transform · FFT · O(n log n)</div>
+
+  <p>Перетворення Фур'є розкладає сигнал (або будь-яку послідовність чисел) на суму синусоїд різних частот. В алгоритміці важливе як потужний інструмент для множення поліномів, обробки сигналів і стиснення даних.</p>
+
+  <h3>// Дискретне перетворення Фур'є (DFT)</h3>
+  <div class="formula-block">
+    <span class="hi">X[k]</span> = Σ<sub>n=0</sub><sup>N-1</sup> x[n] · e<sup>−i·2π·k·n/N</sup>
+    <br><span class="dim">де k = 0..N-1  (частотні компоненти)</span>
+    <br><span class="dim">x[n] — вхідний сигнал (N точок)</span>
+    <br><span class="dim">e<sup>−i·2πkn/N</sup> = cos(2πkn/N) − i·sin(2πkn/N)</span>
+  </div>
+
+  <p>Пряме обчислення DFT: <strong>O(N²)</strong> — надто повільно для великих N.</p>
+
+  <h3>// FFT — Fast Fourier Transform (Кулі-Тьюкі, 1965)</h3>
+  <p>Алгоритм «поділяй і владарюй»: рекурсивно ділить DFT розміру N на дві DFT розміру N/2 — парних і непарних індексів.</p>
+
+  <div class="formula-block">
+    <span class="hi">X[k]</span> = E[k] + W<sub>N</sub><sup>k</sup> · O[k]
+    <br><span class="dim">E[k] — DFT парних елементів</span>
+    <br><span class="dim">O[k] — DFT непарних елементів</span>
+    <br><span class="dim">W<sub>N</sub><sup>k</sup> = e<sup>−i2πk/N</sup> — «кручений» множник (twiddle factor)</span>
+    <br><span class="hi">Складність: O(N log N)</span> замість O(N²)
+  </div>
+
+  <h3>// «Метелик» — базова операція FFT</h3>
+  <div class="tree-container" style="text-align:center">
+    <svg width="400" height="130" viewBox="0 0 400 130">
+      <!-- Butterfly diagram -->
+      <!-- Left inputs -->
+      <circle cx="60" cy="40" r="18" fill="#0a1520" stroke="#22d3ee" stroke-width="2"/>
+      <text x="60" y="44" font-family="IBM Plex Mono" font-size="11" font-weight="700" fill="#22d3ee" text-anchor="middle">a</text>
+      <circle cx="60" cy="90" r="18" fill="#0a1520" stroke="#22d3ee" stroke-width="2"/>
+      <text x="60" y="94" font-family="IBM Plex Mono" font-size="11" font-weight="700" fill="#22d3ee" text-anchor="middle">b</text>
+
+      <!-- Lines -->
+      <line x1="78" y1="40" x2="322" y2="40" stroke="#1a3050" stroke-width="1.5"/>
+      <line x1="78" y1="90" x2="322" y2="90" stroke="#1a3050" stroke-width="1.5"/>
+      <line x1="78" y1="40" x2="200" y2="90" stroke="#22d3ee" stroke-width="1.5" opacity="0.5"/>
+      <line x1="78" y1="90" x2="200" y2="40" stroke="#22d3ee" stroke-width="1.5" opacity="0.5"/>
+
+      <!-- Twiddle factor -->
+      <rect x="185" y="72" width="30" height="16" rx="3" fill="#0e2030" stroke="#22d3ee" stroke-width="1"/>
+      <text x="200" y="84" font-family="IBM Plex Mono" font-size="9" fill="#22d3ee" text-anchor="middle">W^k</text>
+
+      <!-- Right outputs -->
+      <circle cx="340" cy="40" r="18" fill="#0a1520" stroke="#22d3ee" stroke-width="2"/>
+      <text x="340" y="37" font-family="IBM Plex Mono" font-size="9" fill="#22d3ee" text-anchor="middle">a+</text>
+      <text x="340" y="49" font-family="IBM Plex Mono" font-size="9" fill="#6b8b9b" text-anchor="middle">W·b</text>
+      <circle cx="340" cy="90" r="18" fill="#0a1520" stroke="#22d3ee" stroke-width="2"/>
+      <text x="340" y="87" font-family="IBM Plex Mono" font-size="9" fill="#22d3ee" text-anchor="middle">a−</text>
+      <text x="340" y="99" font-family="IBM Plex Mono" font-size="9" fill="#6b8b9b" text-anchor="middle">W·b</text>
+
+      <text x="200" y="125" font-family="IBM Plex Mono" font-size="10" fill="#6b6b8a" text-anchor="middle">«Метелик»: 1 множення + 2 додавання</text>
+    </svg>
+  </div>
+
+  <h3>// Інтерактивна демо: частоти сигналу</h3>
+  <div class="tree-container">
+    <div style="display:flex;gap:0.7rem;flex-wrap:wrap;margin-bottom:1rem;">
+      <button class="btn btn-b" onclick="setSignal('sine')">Синус (1 частота)</button>
+      <button class="btn btn-b" onclick="setSignal('multi')">Мікс частот</button>
+      <button class="btn btn-b" onclick="setSignal('square')">Прямокутна хвиля</button>
+    </div>
+    <div style="margin-bottom:0.5rem;font-family:'IBM Plex Mono',monospace;font-size:0.75rem;color:var(--muted)">СИГНАЛ (часова область):</div>
+    <canvas id="sig-canvas" width="500" height="80" style="width:100%;border:1px solid var(--border);border-radius:4px;background:#080810"></canvas>
+    <div style="margin:0.8rem 0 0.3rem;font-family:'IBM Plex Mono',monospace;font-size:0.75rem;color:var(--muted)">СПЕКТР (частотна область / FFT):</div>
+    <canvas id="fft-canvas" width="500" height="100" style="width:100%;border:1px solid var(--border);border-radius:4px;background:#080810"></canvas>
+    <div id="fft-info" style="font-family:'IBM Plex Mono',monospace;font-size:0.75rem;color:var(--muted);margin-top:0.5rem">— виберіть сигнал —</div>
+  </div>
+
+  <h3>// Застосування в алгоритмах</h3>
+  <div class="grid-2">
+    <div class="card">
+      <h4>Множення поліномів</h4>
+      <p>Замість O(n²) наївного множення: FFT → поелементне множення → IFFT = O(n log n). Основа швидкого множення великих чисел.</p>
+    </div>
+    <div class="card">
+      <h4>Стиснення (JPEG, MP3)</h4>
+      <p>DCT (косинусне перетворення) — варіант FFT. Перетворює блок пікселів/семплів у частоти, відкидає незначущі → стиснення.</p>
+    </div>
+    <div class="card">
+      <h4>Конволюція</h4>
+      <p>Операція f*g у часовій області = поелементне множення F·G у частотній. Використовується в CNN (deep learning), обробці зображень.</p>
+    </div>
+    <div class="card">
+      <h4>String matching</h4>
+      <p>FFT-based string matching: знайти всі входження патерну у рядку за O(n log n) замість O(n·m).</p>
+    </div>
+  </div>
+
+  <h3>// Складність</h3>
+  <div class="complexity">
+    <table>
+      <tr><th>Алгоритм</th><th>Час</th><th>Пам'ять</th></tr>
+      <tr><td>DFT (наївний)</td><td class="bad">O(N²)</td><td class="avg">O(N)</td></tr>
+      <tr><td>FFT (Кулі-Тьюкі)</td><td class="good">O(N log N)</td><td class="avg">O(N)</td></tr>
+      <tr><td>IFFT (обернений)</td><td class="good">O(N log N)</td><td class="avg">O(N)</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ======== SECTION 7: BACKTRACKING ======== -->
+<div id="backtrack" class="section">
+  <h2>Бектрекінг (Backtracking)</h2>
+  <div class="tag backtrack">Brute Force · Pruning · Constraint Satisfaction</div>
+
+  <p><strong>Бектрекінг</strong> — систематичний перебір всіх можливих варіантів з відкатом при виявленні тупика. Це «розумна» груба сила: замість перевірки всіх 2ⁿ чи n! варіантів — обрізаємо гілки (pruning), як тільки розуміємо, що цей шлях не приведе до рішення.</p>
+
+  <h3>// Загальна схема</h3>
+  <div class="pseudo"><span class="kw">function</span> <span class="fn">backtrack</span>(<span class="vr">state</span>):
+  <span class="kw">if</span> <span class="fn">isSolution</span>(<span class="vr">state</span>):
+    <span class="fn">recordSolution</span>(<span class="vr">state</span>)
+    <span class="kw">return</span>
+
+  <span class="kw">for</span> <span class="vr">choice</span> <span class="kw">in</span> <span class="fn">getCandidates</span>(<span class="vr">state</span>):
+    <span class="kw">if</span> <span class="fn">isValid</span>(<span class="vr">state</span>, <span class="vr">choice</span>):  <span class="cm">// pruning!</span>
+      <span class="fn">apply</span>(<span class="vr">state</span>, <span class="vr">choice</span>)
+      <span class="fn">backtrack</span>(<span class="vr">state</span>)
+      <span class="fn">undo</span>(<span class="vr">state</span>, <span class="vr">choice</span>)   <span class="cm">// відкат</span></div>
+
+  <h3>// Дерево пошуку (N-Queens, N=4)</h3>
+  <div class="tree-container">
+    <svg width="500" height="260" viewBox="0 0 500 260">
+      <!-- Level 0: root -->
+      <g class="bt-node-ok"><circle cx="250" cy="25" r="18"/><text class="node-label" x="250" y="25">☐</text></g>
+
+      <!-- Level 1: place queen in row 1 -->
+      <line x1="250" y1="43" x2="90" y2="95" stroke="#2a2a40" stroke-width="1.5"/>
+      <line x1="250" y1="43" x2="200" y2="95" stroke="#2a2a40" stroke-width="1.5"/>
+      <line x1="250" y1="43" x2="305" y2="95" stroke="#2a2a40" stroke-width="1.5"/>
+      <line x1="250" y1="43" x2="415" y2="95" stroke="#2a2a40" stroke-width="1.5"/>
+
+      <g class="bt-node-ok"><circle cx="90" cy="110" r="18"/><text class="node-label" x="90" y="110">C1</text></g>
+      <g class="bt-node-ok"><circle cx="200" cy="110" r="18"/><text class="node-label" x="200" y="110">C2</text></g>
+      <g class="bt-node-ok"><circle cx="305" cy="110" r="18"/><text class="node-label" x="305" y="110">C3</text></g>
+      <g class="bt-node-ok"><circle cx="415" cy="110" r="18"/><text class="node-label" x="415" y="110">C4</text></g>
+
+      <!-- Level 2: from C1 -->
+      <line x1="90" y1="128" x2="45" y2="180" stroke="#2a2a40" stroke-width="1.2"/>
+      <line x1="90" y1="128" x2="90" y2="180" stroke="#2a2a40" stroke-width="1.2"/>
+      <line x1="90" y1="128" x2="135" y2="180" stroke="#2a2a40" stroke-width="1.2"/>
+      <g class="bt-node-fail"><circle cx="45" cy="195" r="14"/><text class="node-label" x="45" y="195" style="font-size:10px">✗</text></g>
+      <g class="bt-node-fail"><circle cx="90" cy="195" r="14"/><text class="node-label" x="90" y="195" style="font-size:10px">✗</text></g>
+      <g class="bt-node-ok"><circle cx="135" cy="195" r="14"/><text class="node-label" x="135" y="195" style="font-size:10px">→</text></g>
+
+      <!-- Level 2: from C2 -->
+      <line x1="200" y1="128" x2="175" y2="180" stroke="#2a2a40" stroke-width="1.2"/>
+      <line x1="200" y1="128" x2="225" y2="180" stroke="#2a2a40" stroke-width="1.2"/>
+      <g class="bt-node-fail"><circle cx="175" cy="195" r="14"/><text class="node-label" x="175" y="195" style="font-size:10px">✗</text></g>
+      <g class="bt-node-ok"><circle cx="225" cy="195" r="14"/><text class="node-label" x="225" y="195" style="font-size:10px">→</text></g>
+
+      <!-- From C3 -->
+      <line x1="305" y1="128" x2="280" y2="180" stroke="#2a2a40" stroke-width="1.2"/>
+      <line x1="305" y1="128" x2="330" y2="180" stroke="#2a2a40" stroke-width="1.2"/>
+      <g class="bt-node-ok"><circle cx="280" cy="195" r="14"/><text class="node-label" x="280" y="195" style="font-size:10px">→</text></g>
+      <g class="bt-node-fail"><circle cx="330" cy="195" r="14"/><text class="node-label" x="330" y="195" style="font-size:10px">✗</text></g>
+
+      <!-- From C4 -->
+      <line x1="415" y1="128" x2="385" y2="180" stroke="#2a2a40" stroke-width="1.2"/>
+      <line x1="415" y1="128" x2="415" y2="180" stroke="#2a2a40" stroke-width="1.2"/>
+      <line x1="415" y1="128" x2="455" y2="180" stroke="#2a2a40" stroke-width="1.2"/>
+      <g class="bt-node-fail"><circle cx="385" cy="195" r="14"/><text class="node-label" x="385" y="195" style="font-size:10px">✗</text></g>
+      <g class="bt-node-fail"><circle cx="415" cy="195" r="14"/><text class="node-label" x="415" y="195" style="font-size:10px">✗</text></g>
+      <g class="bt-node-ok"><circle cx="455" cy="195" r="14"/><text class="node-label" x="455" y="195" style="font-size:10px">→</text></g>
+
+      <!-- Legend -->
+      <circle cx="20" cy="240" r="8" fill="#0a1a0a" stroke="#22c55e" stroke-width="1.5"/>
+      <text x="32" y="244" font-family="IBM Plex Mono" font-size="9" fill="#22c55e">valid</text>
+      <circle cx="80" cy="240" r="8" fill="#1a0a0a" stroke="#ff4444" stroke-width="1.5" stroke-dasharray="3,1.5"/>
+      <text x="92" y="244" font-family="IBM Plex Mono" font-size="9" fill="#ff4444">pruned ✗</text>
+    </svg>
+  </div>
+
+  <h3>// Інтерактивний N-Queens</h3>
+  <div class="tree-container">
+    <div style="display:flex;gap:0.7rem;align-items:center;flex-wrap:wrap;margin-bottom:1rem;">
+      <label style="font-family:'IBM Plex Mono',monospace;font-size:0.82rem;color:var(--muted)">N =</label>
+      <select id="nq-size" style="font-family:'IBM Plex Mono',monospace;font-size:0.82rem;background:#111118;color:#fff;border:1px solid var(--border);padding:0.3rem 0.6rem;border-radius:4px;">
+        <option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="8">8</option>
+      </select>
+      <button class="btn btn-b" onclick="solveNQueens()">Розв'язати</button>
+      <button class="btn" style="background:rgba(255,68,68,0.1);border-color:rgba(255,68,68,0.3);color:#ff6666;" onclick="clearQueens()">Очистити</button>
+    </div>
+    <div id="nq-board"></div>
+    <div id="nq-info" style="font-family:'IBM Plex Mono',monospace;font-size:0.8rem;color:var(--muted);margin-top:0.7rem"></div>
+  </div>
+
+  <h3>// Класичні задачі бектрекінгу</h3>
+  <div class="grid-2">
+    <div class="card">
+      <h4>N-Queens</h4>
+      <p>Розставити N ферзів на NxN дошці так, щоб жоден не бив іншого. Рішень: 92 для N=8.</p>
+    </div>
+    <div class="card">
+      <h4>Sudoku Solver</h4>
+      <p>Заповнити сітку 9×9 за правилами судоку. Backtracking з constraint propagation (Arc Consistency).</p>
+    </div>
+    <div class="card">
+      <h4>Subset Sum / Knapsack</h4>
+      <p>Чи існує підмножина, що дає суму S? Backtracking з branch-and-bound pruning.</p>
+    </div>
+    <div class="card">
+      <h4>Graph Coloring</h4>
+      <p>Розфарбувати граф у k кольорів, щоб суміжні вершини мали різні кольори. Застосовується у плануванні.</p>
+    </div>
+  </div>
+
+  <h3>// Складність та оптимізації</h3>
+  <div class="complexity">
+    <table>
+      <tr><th>Підхід</th><th>Час (найгірший)</th><th>Примітка</th></tr>
+      <tr><td>Груба сила</td><td class="bad">O(n!) або O(2ⁿ)</td><td style="color:var(--muted);font-size:0.82rem">без відсічення</td></tr>
+      <tr><td>Backtracking</td><td class="avg">O(n!) з відсіченням</td><td style="color:var(--muted);font-size:0.82rem">на практиці набагато швидше</td></tr>
+      <tr><td>+ Forward Checking</td><td class="avg">значно краще</td><td style="color:var(--muted);font-size:0.82rem">перевірка наперед</td></tr>
+      <tr><td>+ Arc Consistency</td><td class="good">ще краще</td><td style="color:var(--muted);font-size:0.82rem">AC-3 алгоритм</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ======== SECTION 8: TREE TRAVERSAL ======== -->
+<div id="traversal" class="section">
+  <h2>Обходи дерева (Tree Traversal)</h2>
+  <div class="tag traversal">DFS · BFS · Pre/In/Post-order</div>
+
+  <p>Обхід — систематичне відвідування всіх вузлів дерева. Вибір порядку залежить від задачі: для сортування — inorder, для копіювання — preorder, для видалення — postorder, для пошуку за рівнем — BFS.</p>
+
+  <h3>// Інтерактивна демонстрація</h3>
+  <div class="tree-container">
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;margin-bottom:1rem;">
+      <button class="btn" style="background:rgba(163,230,53,0.1);border-color:rgba(163,230,53,0.3);color:#a3e635;" onclick="runTraversal('inorder')">Inorder (LNR)</button>
+      <button class="btn" style="background:rgba(59,130,246,0.1);border-color:rgba(59,130,246,0.4);color:#60a5fa;" onclick="runTraversal('preorder')">Preorder (NLR)</button>
+      <button class="btn" style="background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.3);color:#fbbf24;" onclick="runTraversal('postorder')">Postorder (LRN)</button>
+      <button class="btn" style="background:rgba(168,85,247,0.1);border-color:rgba(168,85,247,0.3);color:#c084fc;" onclick="runTraversal('bfs')">BFS (рівнями)</button>
+      <button class="btn btn-b" onclick="stopTraversal()">■ Стоп</button>
+    </div>
+    <svg id="trav-svg" width="460" height="200" viewBox="0 0 460 200">
+      <line class="edge" x1="230" y1="35" x2="130" y2="95"/>
+      <line class="edge" x1="230" y1="35" x2="330" y2="95"/>
+      <line class="edge" x1="130" y1="95" x2="75" y2="160"/>
+      <line class="edge" x1="130" y1="95" x2="185" y2="160"/>
+      <line class="edge" x1="330" y1="95" x2="280" y2="160"/>
+      <line class="edge" x1="330" y1="95" x2="390" y2="160"/>
+      <g id="tn-4" class="node-trav"><circle cx="230" cy="35" r="22"/><text class="node-label" x="230" y="35">4</text></g>
+      <g id="tn-2" class="node-trav"><circle cx="130" cy="95" r="22"/><text class="node-label" x="130" y="95">2</text></g>
+      <g id="tn-6" class="node-trav"><circle cx="330" cy="95" r="22"/><text class="node-label" x="330" y="95">6</text></g>
+      <g id="tn-1" class="node-trav"><circle cx="75" cy="160" r="22"/><text class="node-label" x="75" y="160">1</text></g>
+      <g id="tn-3" class="node-trav"><circle cx="185" cy="160" r="22"/><text class="node-label" x="185" y="160">3</text></g>
+      <g id="tn-5" class="node-trav"><circle cx="280" cy="160" r="22"/><text class="node-label" x="280" y="160">5</text></g>
+      <g id="tn-7" class="node-trav"><circle cx="390" cy="160" r="22"/><text class="node-label" x="390" y="160">7</text></g>
+    </svg>
+    <div class="trav-output" id="trav-output"><span>Результат:</span>—</div>
+    <div id="trav-desc" style="font-family:'IBM Plex Mono',monospace;font-size:0.78rem;color:var(--muted);margin-top:0.5rem"></div>
+  </div>
+
+  <h3>// Чотири основні обходи</h3>
+  <div class="grid-2">
+    <div class="card">
+      <h4 style="color:#a3e635">Inorder · L → N → R</h4>
+      <p>Для BST дає відсортовану послідовність. Результат: <strong style="color:#a3e635">1 2 3 4 5 6 7</strong></p>
+    </div>
+    <div class="card">
+      <h4 style="color:#60a5fa">Preorder · N → L → R</h4>
+      <p>Корінь перший — зручний для серіалізації/копіювання дерева. Результат: <strong style="color:#60a5fa">4 2 1 3 6 5 7</strong></p>
+    </div>
+    <div class="card">
+      <h4 style="color:#fbbf24">Postorder · L → R → N</h4>
+      <p>Батько після нащадків — для видалення дерева, обчислення виразів. Результат: <strong style="color:#fbbf24">1 3 2 5 7 6 4</strong></p>
+    </div>
+    <div class="card">
+      <h4 style="color:#c084fc">BFS / Level-order</h4>
+      <p>Рівень за рівнем через чергу (queue). Результат: <strong style="color:#c084fc">4 2 6 1 3 5 7</strong>. Знаходить найкоротший шлях у незважених графах.</p>
+    </div>
+  </div>
+
+  <h3>// Реалізація (TypeScript)</h3>
+  <div class="pseudo"><span class="cm">// Inorder — рекурсивний</span>
+<span class="kw">function</span> <span class="fn">inorder</span>&lt;T&gt;(<span class="vr">node</span>: TreeNode&lt;T&gt; | <span class="kw">null</span>): T[] {
+  <span class="kw">if</span> (!<span class="vr">node</span>) <span class="kw">return</span> [];
+  <span class="kw">return</span> [...<span class="fn">inorder</span>(<span class="vr">node</span>.left), <span class="vr">node</span>.val, ...<span class="fn">inorder</span>(<span class="vr">node</span>.right)];
+}
+
+<span class="cm">// BFS — ітеративний через чергу</span>
+<span class="kw">function</span> <span class="fn">bfs</span>&lt;T&gt;(<span class="vr">root</span>: TreeNode&lt;T&gt; | <span class="kw">null</span>): T[] {
+  <span class="kw">if</span> (!<span class="vr">root</span>) <span class="kw">return</span> [];
+  <span class="kw">const</span> <span class="vr">queue</span> = [<span class="vr">root</span>], <span class="vr">result</span>: T[] = [];
+  <span class="kw">while</span> (<span class="vr">queue</span>.length) {
+    <span class="kw">const</span> <span class="vr">node</span> = <span class="vr">queue</span>.<span class="fn">shift</span>()!;
+    <span class="vr">result</span>.<span class="fn">push</span>(<span class="vr">node</span>.val);
+    <span class="kw">if</span> (<span class="vr">node</span>.left)  <span class="vr">queue</span>.<span class="fn">push</span>(<span class="vr">node</span>.left);
+    <span class="kw">if</span> (<span class="vr">node</span>.right) <span class="vr">queue</span>.<span class="fn">push</span>(<span class="vr">node</span>.right);
+  }
+  <span class="kw">return</span> <span class="vr">result</span>;
+}</div>
+
+  <h3>// DFS: стек vs рекурсія</h3>
+  <div class="rules" style="border-left-color:#a3e635">
+    <ul>
+      <li><strong>Рекурсія</strong>: елегантна, але може переповнити стек для глибоких дерев (stack overflow при глибині ~10k у JS)</li>
+      <li><strong>Явний стек</strong>: ітеративна DFS — безпечна для великих дерев, контрольована пам'ять</li>
+      <li><strong>Morris Traversal</strong>: inorder за O(1) пам'яті — тимчасово модифікує вказівники дерева (threading)</li>
+    </ul>
+  </div>
+
+  <h3>// Складність</h3>
+  <div class="complexity">
+    <table>
+      <tr><th>Обхід</th><th>Час</th><th>Пам'ять</th><th>Структура</th></tr>
+      <tr><td>Inorder / Pre / Post (рекурсія)</td><td class="good">O(n)</td><td class="avg">O(h)</td><td style="color:var(--muted);font-size:0.82rem">h = висота</td></tr>
+      <tr><td>BFS (черга)</td><td class="good">O(n)</td><td class="avg">O(w)</td><td style="color:var(--muted);font-size:0.82rem">w = макс. ширина</td></tr>
+      <tr><td>Morris Traversal</td><td class="good">O(n)</td><td class="good">O(1)</td><td style="color:var(--muted);font-size:0.82rem">модифікує дерево</td></tr>
+    </table>
+  </div>
+</div>
+
+<script>
+  function show(id, btn) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    if (btn) btn.classList.add('active');
+    try { stopTraversal(); } catch(e) {}
+    if (id === 'splay') { try { resetSplay(); } catch(e) {} }
+  }
+
+  // ---- Splay demo ----
+  function renderSplay(config, logMsg) {
+    const svg = document.getElementById('splay-svg');
+    svg.innerHTML = '';
+    config.edges.forEach(([x1,y1,x2,y2]) => {
+      const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+      line.setAttribute('x1',x1); line.setAttribute('y1',y1);
+      line.setAttribute('x2',x2); line.setAttribute('y2',y2);
+      line.setAttribute('class','edge');
+      svg.appendChild(line);
+    });
+    config.nodes.forEach(({v,x,y,cls}) => {
+      const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+      g.setAttribute('class',cls);
+      const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      c.setAttribute('cx',x); c.setAttribute('cy',y); c.setAttribute('r','20');
+      const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+      t.setAttribute('class','node-label'); t.setAttribute('x',x); t.setAttribute('y',y);
+      t.textContent = v;
+      g.appendChild(c); g.appendChild(t); svg.appendChild(g);
+    });
+    document.getElementById('splay-log').textContent = logMsg;
+  }
+
+  function resetSplay() {
+    renderSplay({
+      nodes: [{v:5,x:200,y:35,cls:'node-splay'},{v:3,x:110,y:100,cls:'node-splay'},{v:7,x:290,y:100,cls:'node-splay'},{v:1,x:60,y:165,cls:'node-splay'},{v:4,x:160,y:165,cls:'node-splay'},{v:6,x:240,y:165,cls:'node-splay'},{v:8,x:340,y:165,cls:'node-splay'}],
+      edges: [[200,35,110,100],[200,35,290,100],[110,100,60,165],[110,100,160,165],[290,100,240,165],[290,100,340,165]]
+    }, 'Початковий стан: корінь = 5');
+  }
+
+  function splayNode(v) {
+    const msgs = {4:'Splay(4): Zig-Zig (4→3) + Zig → 4 стає коренем',7:'Splay(7): Zig (права дитина кореня) → 7 стає коренем',1:'Splay(1): Zig-Zag + Zig → 1 піднімається у корінь'};
+    const configs = {
+      4:{nodes:[{v:4,x:200,y:35,cls:'node-splay-hot'},{v:3,x:110,y:100,cls:'node-splay'},{v:5,x:285,y:100,cls:'node-splay'},{v:1,x:60,y:165,cls:'node-splay'},{v:7,x:340,y:165,cls:'node-splay'},{v:6,x:310,y:220,cls:'node-splay'},{v:8,x:370,y:220,cls:'node-splay'}],edges:[[200,35,110,100],[200,35,285,100],[110,100,60,165],[285,100,340,165],[340,165,310,220],[340,165,370,220]]},
+      7:{nodes:[{v:7,x:200,y:35,cls:'node-splay-hot'},{v:5,x:110,y:100,cls:'node-splay'},{v:8,x:310,y:100,cls:'node-splay'},{v:3,x:60,y:165,cls:'node-splay'},{v:6,x:160,y:165,cls:'node-splay'},{v:1,x:35,y:230,cls:'node-splay'},{v:4,x:85,y:230,cls:'node-splay'}],edges:[[200,35,110,100],[200,35,310,100],[110,100,60,165],[110,100,160,165],[60,165,35,230],[60,165,85,230]]},
+      1:{nodes:[{v:1,x:200,y:35,cls:'node-splay-hot'},{v:3,x:310,y:100,cls:'node-splay'},{v:4,x:260,y:165,cls:'node-splay'},{v:5,x:360,y:165,cls:'node-splay'},{v:7,x:330,y:230,cls:'node-splay'},{v:6,x:310,y:270,cls:'node-splay'},{v:8,x:380,y:230,cls:'node-splay'}],edges:[[200,35,310,100],[310,100,260,165],[310,100,360,165],[360,165,330,230],[360,165,380,230],[330,230,310,270]]}
+    };
+    renderSplay(configs[v], msgs[v]);
+  }
+
+  // ---- FFT demo ----
+  function drawSignal(canvas, data, color) {
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0,0,W,H);
+    ctx.strokeStyle = color; ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    data.forEach((v,i) => {
+      const x = i/data.length*W;
+      const y = H/2 - v*(H/2-4);
+      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+    ctx.strokeStyle = '#1a2a40'; ctx.lineWidth = 0.5;
+    ctx.beginPath(); ctx.moveTo(0,H/2); ctx.lineTo(W,H/2); ctx.stroke();
+  }
+
+  function drawSpectrum(canvas, mags, color) {
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0,0,W,H);
+    const n = mags.length;
+    const maxM = Math.max(...mags, 0.01);
+    const bw = W/n;
+    mags.forEach((m,i) => {
+      const bh = (m/maxM)*(H-8);
+      const grad = ctx.createLinearGradient(0,H-bh,0,H);
+      grad.addColorStop(0, color); grad.addColorStop(1, '#0a1520');
+      ctx.fillStyle = grad;
+      ctx.fillRect(i*bw+1, H-bh, bw-2, bh);
+    });
+  }
+
+  function fftMagnitudes(signal) {
+    const n = signal.length;
+    const mags = [];
+    for (let k=0; k<n/2; k++) {
+      let re=0, im=0;
+      for (let t=0; t<n; t++) {
+        re += signal[t]*Math.cos(2*Math.PI*k*t/n);
+        im -= signal[t]*Math.sin(2*Math.PI*k*t/n);
+      }
+      mags.push(Math.sqrt(re*re+im*im)/n);
+    }
+    return mags;
+  }
+
+  function setSignal(type) {
+    const N = 128;
+    let sig = [];
+    let info = '';
+    if (type==='sine') {
+      for(let i=0;i<N;i++) sig.push(Math.sin(2*Math.PI*3*i/N));
+      info = 'Чиста синусоїда (частота 3) → спектр: 1 пік';
+    } else if (type==='multi') {
+      for(let i=0;i<N;i++) sig.push(0.6*Math.sin(2*Math.PI*3*i/N)+0.3*Math.sin(2*Math.PI*8*i/N)+0.1*Math.sin(2*Math.PI*20*i/N));
+      info = 'Мікс частот 3+8+20 → спектр: 3 піки';
+    } else {
+      for(let i=0;i<N;i++) { let v=0; for(let h=1;h<=15;h+=2) v+=Math.sin(2*Math.PI*h*i/N)/h; sig.push(v*0.8); }
+      info = 'Прямокутна хвиля = нескінченна сума непарних гармонік';
+    }
+    const mags = fftMagnitudes(sig);
+    drawSignal(document.getElementById('sig-canvas'), sig, '#22d3ee');
+    drawSpectrum(document.getElementById('fft-canvas'), mags, '#22d3ee');
+    document.getElementById('fft-info').textContent = info;
+  }
+
+  // ---- N-Queens ----
+  function solveNQueens() {
+    const N = parseInt(document.getElementById('nq-size').value);
+    const solutions = [];
+    const board = Array(N).fill(-1);
+    function isSafe(row, col) {
+      for (let r=0;r<row;r++) {
+        if (board[r]===col || Math.abs(board[r]-col)===row-r) return false;
+      }
+      return true;
+    }
+    function solve(row) {
+      if (row===N) { solutions.push([...board]); return; }
+      for (let c=0;c<N;c++) {
+        if (isSafe(row,c)) { board[row]=c; solve(row+1); board[row]=-1; }
+      }
+    }
+    solve(0);
+    const sol = solutions[0];
+    renderNQueens(N, sol);
+    document.getElementById('nq-info').textContent = `Знайдено ${solutions.length} розв'язків. Показано перший.`;
+  }
+
+  function renderNQueens(N, placement) {
+    const el = document.getElementById('nq-board');
+    const cs = Math.min(Math.floor(400/N), 48);
+    let html = `<div style="display:inline-grid;grid-template-columns:repeat(${N},${cs}px);gap:0;border:1.5px solid #c084fc;border-radius:4px;overflow:hidden">`;
+    for (let r=0;r<N;r++) for (let c=0;c<N;c++) {
+      const isQ = placement && placement[r]===c;
+      const bg = (r+c)%2===0 ? '#16082a' : '#0e0518';
+      html += `<div style="width:${cs}px;height:${cs}px;background:${bg};display:flex;align-items:center;justify-content:center;font-size:${cs*0.55}px;border:none">${isQ?'♛':''}</div>`;
+    }
+    html += '</div>';
+    el.innerHTML = html;
+  }
+
+  function clearQueens() {
+    const N = parseInt(document.getElementById('nq-size').value);
+    renderNQueens(N, null);
+    document.getElementById('nq-info').textContent = '';
+  }
+
+  // ---- Tree Traversal ----
+  let travTimer = null;
+  const travOrders = {
+    inorder:  [1,2,3,4,5,6,7],
+    preorder: [4,2,1,3,6,5,7],
+    postorder:[1,3,2,5,7,6,4],
+    bfs:      [4,2,6,1,3,5,7]
+  };
+  const travDesc = {
+    inorder:  'L → N → R · Для BST дає відсортовану послідовність',
+    preorder: 'N → L → R · Корінь перший, зручний для серіалізації',
+    postorder:'L → R → N · Батько після нащадків, для видалення/обчислення',
+    bfs:      'Queue (черга) · Рівень за рівнем, знаходить найкоротший шлях'
+  };
+  const travColors = {inorder:'#a3e635',preorder:'#60a5fa',postorder:'#fbbf24',bfs:'#c084fc'};
+
+  function stopTraversal() {
+    if (travTimer) { clearTimeout(travTimer); travTimer = null; }
+    [1,2,3,4,5,6,7].forEach(v => {
+      const el = document.getElementById('tn-'+v);
+      if (el) el.setAttribute('class','node-trav');
+    });
+    document.getElementById('trav-output').innerHTML = '<span>Результат:</span>—';
+    document.getElementById('trav-desc').textContent = '';
+  }
+
+  function runTraversal(type) {
+    stopTraversal();
+    const order = travOrders[type];
+    const color = travColors[type];
+    document.getElementById('trav-desc').textContent = travDesc[type];
+    let i = 0, visited = [];
+    const out = document.getElementById('trav-output');
+    function step() {
+      if (i > 0) {
+        const prev = document.getElementById('tn-'+order[i-1]);
+        if (prev) { prev.setAttribute('class','node-trav-visited'); prev.querySelector('circle').style.stroke = color; prev.querySelector('circle').style.opacity = '0.6'; }
+      }
+      if (i < order.length) {
+        const cur = document.getElementById('tn-'+order[i]);
+        if (cur) cur.setAttribute('class','node-trav-active');
+        visited.push(order[i]);
+        out.innerHTML = `<span>Результат:</span>${visited.join(' → ')}`;
+        i++;
+        travTimer = setTimeout(step, 700);
+      }
+    }
+    step();
+  }
+
+  // Init
+  resetSplay();
+  renderNQueens(4, null);
+</script>
+</body>
+</html>
